@@ -1,10 +1,13 @@
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
-public class UserInfo {
+import java.util.List;
+
+public class UserInfo implements Serializable{
     public Socket socket;
     public String account;
     public String password;
-    public ArrayList<UserInfo> friends = new ArrayList<>();
+    public List<UserInfo> friends = new ArrayList<UserInfo>();
     public int count;
 
     public UserInfo(String account,String password,Socket socket){
@@ -12,6 +15,7 @@ public class UserInfo {
         this.account = account;
         this.password = password;
         this.count = 0;
+        friends.add(this);
     }
 
     @Override

@@ -128,7 +128,7 @@ public class ChatServer {
 //                                        sendSingleChatMsg(clientMessageInfo);
                                         break;
                                     case MessageType.FRIEND_LIST:
-                                        sendFriendList();
+                                        sendFriendList(clientMessageInfo);
                                         break;
                                     case MessageType.REGISTER:
                                         register(clientMessageInfo);
@@ -167,9 +167,11 @@ public class ChatServer {
                     userInfo = new UserInfo(account,password,client);
                     //注册成功，添加到users
                     users.add(userInfo);
+                    println("add to users success");
                 }
                 dataOutputStream = new DataOutputStream(client.getOutputStream());
                 dataOutputStream.writeUTF(reply.toJSONString());
+                println("reply:" + reply.toJSONString());
                 dataOutputStream.flush();
 
             } catch (IOException e) {
@@ -246,12 +248,21 @@ public class ChatServer {
 //            }
 //        }
 
-        public synchronized void sendFriendList() {
+        public synchronized void sendFriendList(JSONObject jsonObject) {
             if(!client.isClosed()){
                 try {
                     JSONObject reply = new JSONObject();
+                    reply.put("status",MessageType.STATUS_SUCCESS);
+                    reply.put("status_msg","get friend list success");
                     reply.put("type",MessageType.FRIEND_LIST);
-                    reply.put("friends",JSON.toJSON(userInfo.friends));
+                    JSONArray array = new JSONArray();
+                    for(int i=0;i<userInfo.friends.size();i++){
+                    	JSONObject object = new JSONObject();
+                    	object.put("account", userInfo.friends.get(i).account);
+                    	object.put("ip", userInfo.friends.get(i).socket.getInetAddress().toString());
+                    	array.add(object);
+                    }
+                    reply.put("friends",array);
                     dataOutputStream = new DataOutputStream(client.getOutputStream());
                     dataOutputStream.writeUTF(reply.toJSONString());
                     dataOutputStream.flush();
